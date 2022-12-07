@@ -3,22 +3,18 @@ library(ape)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
-# We are going to use the alignments w complete species sampling
+
+# code should work with all the libraries loaded, just switch out the paths to your directory with alignments
+# We are going to use a subset of BUSCOs from the turtle paper (Gable and Byars et al. 2022) - alignments w complete species sampling
+# There were 685 of these for us
+
 setwd <- ("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpecies685/")
 
 # this is the list of the filenames for the alignments
 in.files <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpecies685", full.names = TRUE)
 filenames <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpecies685", full.names = FALSE)
 
-# this code attempts to read the dna for each alignment as a separate vector but I will probably abondon this
-#aligns <- lapply(in.files, function(x) {
-#  dat <- read.dna(x, format = "fasta", as.character = TRUE, skip = 0)
-#})
-
-
-#aligns <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpecies685/trimal_subset_allSpecies685", full.names = FALSE)
-
-
+# compute the raw and corrected pairwise distances for all of the alignments
 coeffs<- lapply(in.files, function(x) { # this function takes the list of alignments, 
   dat <- read.dna(x, format = "fasta", as.character = TRUE, skip = 0) #loads them into ape
   dat <- as.DNAbin(dat) # and reads them as dnabins
@@ -37,25 +33,29 @@ colnames(cfs) <- c('saturation_cf')
 df <- as.data.frame(cfs)
 bound <- cbind(fn,df)
 colnames(bound) <- c('alignment','saturation_cf')
+
+# this will produce a histogram of all the slopes
 plot <- ggplot(df, aes(x=saturation_cf)) + geom_histogram() + xlab("Slope (Raw distance ~ TN93 distance)") + ylab("Number of Alignments")
 plot
 
 
+# compute statistics from the gene sets
 
-mean(bound$saturation_cf)
-unsat <- subset(bound, saturation_cf > mean(bound$saturation_cf))
-mean(unsat$saturation_cf)
-saturated <- subset(bound, saturation_cf < mean(bound$saturation_cf))
-mean(saturated$saturation_cf)
+mean(bound$saturation_cf) # mean slope
+unsat <- subset(bound, saturation_cf > mean(bound$saturation_cf)) # select the unsaturated genes
+mean(unsat$saturation_cf) # mean of unsaturated genes
+saturated <- subset(bound, saturation_cf < mean(bound$saturation_cf)) # select the saturated  genes
+mean(saturated$saturation_cf) # mean of saturated genes
 
-range(bound$saturation_cf)
-quantile(bound$saturation_cf, probs = c(0.2,0.8))
+range(bound$saturation_cf) # range of all slopes
+quantile(bound$saturation_cf, probs = c(0.2,0.8)) # 20% and 80% quantiles of slopes
 
 # print lists of saturated and unsaturated genes
 lapply(unsat$alignment, write, "unsat.txt", append=TRUE, ncolumns=1000)
 lapply(saturated$alignment, write, "sat.txt", append=TRUE, ncolumns=1000)
 
-#let's compare saturation plots between AApos1_2 and AApos3
+# let's compare saturation plots between AApos1_2 and AApos3
+# assumes you have alignments partitioned by [1st and 2nd] and [3rd] position (we used MACSE)
 pos1_2 <- read.dna("~/Dropbox/turtleBUSCO_ms/saturation/macse/sat_unsat_AApos1_2.fas", format = "fasta", as.character = TRUE, skip = 0) #loads them into ape
 pos1_2 <- as.DNAbin(pos1_2) # and reads them as dnabins
 dist1_2 <- dist.dna(pos1_2, model = "raw") #then estimate the uncorrected distances
