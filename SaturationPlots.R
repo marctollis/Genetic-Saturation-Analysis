@@ -15,6 +15,7 @@ in.files <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpe
 filenames <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSpecies685", full.names = FALSE)
 
 # compute the raw and corrected pairwise distances for all of the alignments
+# adapted from Katie Everson's R code for a single gene: https://www.kmeverson.org/blog/simple-dna-saturation-plots-in-r
 coeffs<- lapply(in.files, function(x) { # this function takes the list of alignments, 
   dat <- read.dna(x, format = "fasta", as.character = TRUE, skip = 0) #loads them into ape
   dat <- as.DNAbin(dat) # and reads them as dnabins
@@ -54,8 +55,8 @@ quantile(bound$saturation_cf, probs = c(0.2,0.8)) # 20% and 80% quantiles of slo
 lapply(unsat$alignment, write, "unsat.txt", append=TRUE, ncolumns=1000)
 lapply(saturated$alignment, write, "sat.txt", append=TRUE, ncolumns=1000)
 
-# let's compare saturation plots between AApos1_2 and AApos3
-# assumes you have alignments partitioned by [1st and 2nd] and [3rd] position (we used MACSE)
+# let's compare saturation plots between AApos1_2 and AApos3 of all the genes
+# assumes you have concatenated alignments partitioned by [1st and 2nd] and [3rd] position (we used MACSE)
 pos1_2 <- read.dna("~/Dropbox/turtleBUSCO_ms/saturation/macse/sat_unsat_AApos1_2.fas", format = "fasta", as.character = TRUE, skip = 0) #loads them into ape
 pos1_2 <- as.DNAbin(pos1_2) # and reads them as dnabins
 dist1_2 <- dist.dna(pos1_2, model = "raw") #then estimate the uncorrected distances
