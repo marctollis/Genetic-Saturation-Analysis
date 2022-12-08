@@ -1,4 +1,5 @@
-## Analyzing DNA Saturation 
+## Analyzing DNA Saturation
+## Marc Tollis, Northern Arizona University
 library(ape)
 library(ggplot2)
 library(dplyr)
