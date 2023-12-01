@@ -20,8 +20,10 @@ filenames <- list.files("~/Dropbox/turtleBUSCO_ms/saturation/trimal_subset_allSp
 coeffs<- lapply(in.files, function(x) { # this function takes the list of alignments, 
   dat <- read.dna(x, format = "fasta", as.character = TRUE, skip = 0) #loads them into ape
   dat <- as.DNAbin(dat) # and reads them as dnabins
-  dist <- dist.dna(dat, model = "raw") #then estimate the uncorrected distances
-  dist.corrected <- dist.dna(dat, model = "TN93") # corrected distances
+  dist <- dist.dna(dat, pairwise.deletion = TRUE, model = "raw") #then estimate the uncorrected distances
+  # toggle pairwise.deletion = TRUE to avoid NA errors
+  dist.corrected <- dist.dna(dat, pairwise.deletion = TRUE, model = "TN93") # corrected distances
+  # toggle pairwise.deletion = TRUE to avoid NA errors
   lm_coef<-coef(lm(dist~dist.corrected)) # calculates the coefficients between
   as.numeric(lm_coef[2]) # saves coefficients as numeric data
   })
