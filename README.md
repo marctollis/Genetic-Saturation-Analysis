@@ -9,3 +9,5 @@ The script will analyze the distribution of slopes, determine the mean for you, 
 
 The R script also contains code that can analyze two files containing concatenated (1st and 2nd) and (3rd) codon positions.
 
+The alignment data is provided in the repository, just download and unzip the files.
+
